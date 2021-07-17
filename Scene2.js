@@ -5,7 +5,7 @@ class Scene2 extends Phaser.Scene {
 
   create() {
 
-    this.background = this.add.tileSprite(0, 0, config.width, config.height, "background");
+    this.background = this.add.tileSprite(0, 0, config.width, config.height , "background");
     this.background.setOrigin(0, 0);
 
     this.ship1 = this.add.sprite(config.width / 2 - 50, config.height / 2, "ship");
@@ -51,17 +51,17 @@ class Scene2 extends Phaser.Scene {
     }
 
 
-    // 2.1 ADD THE PLAYER SHIP
     this.player = this.physics.add.sprite(config.width / 2 - 8, config.height - 64, "player");
     this.player.play("thrust");
-    // 2.2 create the cursorKeys
     this.cursorKeys = this.input.keyboard.createCursorKeys();
-    // 3.3 don't let the player leave the screen
     this.player.setCollideWorldBounds(true);
 
 
-    // 4.1  add a key for the player fire
+
     this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+    // 4.1 create group to hold all our projectiles
+    this.projectiles = this.add.group();
 
 
   }
@@ -77,17 +77,30 @@ class Scene2 extends Phaser.Scene {
 
     this.background.tilePositionY -= 0.5;
 
-    // 3.1 call control player
+
     this.movePlayerManager();
 
-    // 4.2 Event for the player shooting, just once per key pressing
+
     if (Phaser.Input.Keyboard.JustDown(this.spacebar)){
-     console.log("Fire!");
+        // 2.1 call a function to create a beam instance
+        this.shootBeam();
     }
+    // 4.2 update all the beams
+    for(var i = 0; i < this.projectiles.getChildren().length; i++){
+      var beam = this.projectiles.getChildren()[i];
+      beam.update();
+    }
+
 
   }
 
-  // 3.2 define control player
+  // 2.2 create the shootBeam function
+  shootBeam(){
+    // 4.2 add the beam to the croup
+    var beam = new Beam(this);
+  }
+
+
   movePlayerManager(){
 
     this.player.setVelocity(0);
