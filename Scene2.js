@@ -1,6 +1,7 @@
 class Scene2 extends Phaser.Scene {
   constructor() {
     super("playGame");
+
   }
 
   create() {
@@ -29,10 +30,12 @@ class Scene2 extends Phaser.Scene {
 
     this.input.on('gameobjectdown', this.destroyShip, this);
 
-    this.add.text(20, 20, "Playing game", {
-      font: "25px Arial",
-      fill: "yellow"
-    });
+    // 1.1 remove old text
+    // this.text1 = this.add.text(20, 20, "Playing game", {
+    //   font: "25px Arial",
+    //   fill: "yellow"
+    // });
+
 
     this.physics.world.setBoundsCollision();
 
@@ -68,49 +71,80 @@ class Scene2 extends Phaser.Scene {
 
     this.projectiles = this.add.group();
 
-    // 1.1 Add the collider
-    //this.physics.add.collider(this.projectiles, this.powerUps);
-    // 1.2 Remove the projectile on collision
     this.physics.add.collider(this.projectiles, this.powerUps, function(projectile, powerUp) {
       projectile.destroy();
     });
 
-    // 2.1 player can pick powerups
     this.physics.add.overlap(this.player, this.powerUps, this.pickPowerUp, null, this);
 
-    // 3.2 overlap player with enemies
     this.physics.add.overlap(this.player, this.enemies, this.hurtPlayer, null, this);
 
-    // 4.1 add overlaps with callback functions
     this.physics.add.overlap(this.projectiles, this.enemies, this.hitEnemy, null, this);
 
+    // 3.1 Add HUD background
+    var graphics = this.add.graphics();
+    graphics.fillStyle(0x000000, 1);
+    graphics.beginPath();
+    graphics.moveTo(0, 0);
+    graphics.lineTo(config.width, 0);
+    graphics.lineTo(config.width, 20);
+    graphics.lineTo(0, 20);
+    graphics.lineTo(0, 0);
+    //
+    graphics.closePath();
+    graphics.fillPath();
 
+    // 2.1 add a score property
+    this.score = 0;
+
+    // 1.3 new text using bitmap font
+    //this.scoreLabel = this.add.bitmapText(10, 5, "pixelFont", "SCORE ", 16);
+
+    // 4.3 format the score
+    var scoreFormated = this.zeroPad(this.score, 6);
+    this.scoreLabel = this.add.bitmapText(10, 5, "pixelFont", "SCORE " + scoreFormated  , 16);
 
   }
 
-  //2.2 remove powerup when taken
   pickPowerUp(player, powerUp) {
-    // make it inactive and hide it
     powerUp.disableBody(true, true);
   }
 
-  // 3.3 reset position of player and enemy when they crash each other
   hurtPlayer(player, enemy) {
     this.resetShipPos(enemy);
     player.x = config.width / 2 - 8;
     player.y = config.height - 64;
   }
 
-  // 4.3 reset ship position when hit
   hitEnemy(projectile, enemy) {
     projectile.destroy();
     this.resetShipPos(enemy);
+    // 2.2 increase score
+    this.score += 15;
+
+    // 2.3 update the score scoreLabel
+    //this.scoreLabel.text = "SCORE " + this.score;
+
+    // 4.2 format the score
+     var scoreFormated = this.zeroPad(this.score, 6);
+     this.scoreLabel.text = "SCORE " + scoreFormated;
+  }
+
+
+  // 4.1 zero pad format function
+  zeroPad(number, size){
+      var stringNumber = String(number);
+      while(stringNumber.length < (size || 2)){
+        stringNumber = "0" + stringNumber;
+      }
+      return stringNumber;
   }
 
 
 
 
   update() {
+
 
     this.moveShip(this.ship1, 1);
     this.moveShip(this.ship2, 2);
