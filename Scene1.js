@@ -30,7 +30,6 @@ class Scene1 extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 24
     });
-    //1.1 load the spritesheet for the beam
     this.load.spritesheet("beam", "assets/spritesheets/beam.png",{
       frameWidth: 16,
       frameHeight: 16
@@ -93,7 +92,6 @@ class Scene1 extends Phaser.Scene {
       repeat: -1
     });
 
-    // 1.2 animation for the beam
     this.anims.create({
       key: "beam_anim",
       frames: this.anims.generateFrameNumbers("beam"),
